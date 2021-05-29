@@ -26,6 +26,15 @@
   </style>
 </head>
 <body>
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "c65c4b68138b4f0b909b7910fc20afb8",
+      application: "lab9"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>
+
   <fieldset>
     <legend>Error Calculator</legend>
     <input type="number" name="first-num" id="first-num" />
@@ -42,31 +51,48 @@
   </fieldset>
 
   <section id="error-btns">
-    <button>Console Log Demo</button>
-    <button>Console Error Demo</button>
-    <button>Console Dir</button>
-    <button>Console dirxml</button>
-    <button>Console Group Start</button>
-    <button>Console Group End</button>
-    <button>Console Table</button>
-    <button>Start Timer</button>
-    <button>End Timer</button>
-    <button>Console Trace</button>
-    <button>Trigger a Global Error</button>
+    <button onclick="console.log('logging');">Console Log Demo</button>
+    <button onclick="console.error('error log')">Console Error Demo</button>
+    <button onclick="console.dir(document)">Console Dir</button>
+    <button onclick="console.dirxml(document)">Console dirxml</button>
+    <button onclick="console.group()">Console Group Start</button>
+    <button onclick="console.groupEnd()">Console Group End</button>
+    <button onclick="console.table([{'field1':1},{'field2':2,'field1':3}])">Console Table</button>
+    <button onclick="console.time()">Start Timer</button>
+    <button onclick="console.timeEnd()">End Timer</button>
+    <button onclick="let run=()=>{console.trace()}; run();">Console Trace</button>
+    <button onclick="console.assert(2>3, {'key':'string'})">Trigger a Global Error</button>
   </section>
 
   <script>
+
+    class EmptyArgumentError extends Error{
+      constructor(message){
+        super(message);
+        this.name = "EmptyArgumentError";
+      }
+    }
+
     let calculateBtn = document.querySelector('#calculate');
     calculateBtn.addEventListener('click', () => {
-      let output = document.querySelector('output');
-      let firstNum = document.querySelector('#first-num').value;
-      let secondNum = document.querySelector('#second-num').value;
-      let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      try {
+        let output = document.querySelector('output');
+        let firstNum = document.querySelector('#first-num').value;
+        let secondNum = document.querySelector('#second-num').value;
+        let operator = document.querySelector('#operator').value;
+
+        if (firstNum == '' || secondNum == '')
+          throw new EmptyArgumentError("ahahaha empty arguments?");
+
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      } catch(err){
+        if (err instanceof EmptyArgumentError)
+          console.error("error occured: " + err);
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
-    // TODO - Make buttons functional
+
   </script>
 </body>
 </html>
